@@ -704,8 +704,8 @@ function vSettings(){
    <div class="faint tiny">If you move: set the new lease months here, then change the rent and internet amounts and day in Repeating bills. Money already saved stays in the fund and is recounted against the new rent.</div>
    <button class="btn primary" data-act="setsave" data-v="rent">Save rent fund</button></div>
   <div class="card stack"><h2 style="margin:0">Spending account</h2>
-   <div class="row"><label class="f" style="flex:1">Balance (can be negative)<input id="s-pb" inputmode="decimal" value="${spendCfg().start}"></label><label class="f" style="flex:1">As of<input id="s-pd" type="date" value="${spendCfg().startDate}"></label></div>
-   <div class="faint tiny">Chequing minus what you owe on your credit card on that date.</div>
+   <div class="row"><label class="f" for="s-pb" style="flex:1">Balance (can be negative)<span style="display:flex;gap:6px"><button type="button" class="btn small" style="flex:none;min-width:44px;font-weight:700" aria-label="Switch between positive and negative" onclick="const i=document.getElementById('s-pb');let t=i.value.trim().replace(/^[\u2212\u2013]/,'-');i.value=t.startsWith('-')?t.slice(1):'-'+t">±</button><input id="s-pb" inputmode="decimal" style="flex:1;min-width:0" value="${spendCfg().start}"></span></label><label class="f" style="flex:1">As of<input id="s-pd" type="date" value="${spendCfg().startDate}"></label></div>
+   <div class="faint tiny">Chequing minus what you owe on your credit card on that date. Tap ± to make it negative.</div>
    <button class="btn primary" data-act="setsave" data-v="spend">Save</button></div>
   <div class="card stack"><h2 style="margin:0">Saving account</h2>
    <div class="row"><label class="f" style="flex:1">Starting balance<input id="s-sb" inputmode="decimal" value="${sv.start}"></label><label class="f" style="flex:1">As of<input id="s-sd" type="date" value="${sv.startDate}"></label></div>
@@ -837,7 +837,7 @@ document.addEventListener('click',e=>{
   case 'tripadd':{const n=document.getElementById('trip-new').value.trim();if(!n)break;S.trips.trips.push({id:'t'+Date.now().toString(36),n});saveTrips();toast('Trip added');render();break}
   case 'setsave':{if(v==='rent'){const rf=S.settings.rentFund;const b=parseFloat(document.getElementById('s-rb').value);if(isNaN(b)){toast('Enter the rent fund balance.');break}
       rf.start=r2(b);rf.startDate=document.getElementById('s-rd').value||TODAY;rf.first=document.getElementById('s-rf').value;rf.last=document.getElementById('s-rl').value;if(rf.last<rf.first){toast('Lease end must be after the first month.');break}}
-    else if(v==='spend'){const sp=spendCfg();const b=parseFloat(document.getElementById('s-pb').value);if(isNaN(b)){toast('Enter the spending account balance.');break}sp.start=r2(b);sp.startDate=document.getElementById('s-pd').value||TODAY}
+    else if(v==='spend'){const sp=spendCfg();const b=parseFloat(document.getElementById('s-pb').value.replace(/[\u2212\u2013]/g,'-').replace(/[$,\s]/g,''));if(isNaN(b)){toast('Enter the spending account balance.');break}sp.start=r2(b);sp.startDate=document.getElementById('s-pd').value||TODAY}
     else{const sv=S.settings.saving;const b=parseFloat(document.getElementById('s-sb').value);if(isNaN(b)){toast('Enter a starting balance.');break}sv.start=r2(b);sv.startDate=document.getElementById('s-sd').value||TODAY}
     saveSettings();toast('Saved');render();break}
   }
