@@ -337,9 +337,9 @@ function savingAcc(){
 }
 const spendCfg=()=>S.settings.spend||(S.settings.spend={start:0,startDate:'2026-11-01'});
 function spendAcc(){
-  const st=spendCfg();const rfIds=new Set(S.bills.filter(b=>b.rf).map(b=>b.id));let bal=+st.start||0;const list=[];const byM={};
+  const st=spendCfg();const rfIds=new Set(S.bills.filter(b=>b.rf).map(b=>b.id));const incl=new Set(st.incl||[]);let bal=+st.start||0;const list=[];const byM={};
   for(const i of allItemsFlat()){
-    if(i.up||i.d.length<10||i.d<st.startDate)continue;
+    if(i.up||i.d.length<10||i.d<st.startDate||(i.d===st.startDate&&incl.has(i.id)))continue;
     let v=0;
     if(i.k==='in'&&i.acc==='spend')v=i.a;
     else if(i.k==='wd'&&i.acc==='spend')v=-i.a;
@@ -837,7 +837,7 @@ document.addEventListener('click',e=>{
   case 'tripadd':{const n=document.getElementById('trip-new').value.trim();if(!n)break;S.trips.trips.push({id:'t'+Date.now().toString(36),n});saveTrips();toast('Trip added');render();break}
   case 'setsave':{if(v==='rent'){const rf=S.settings.rentFund;const b=parseFloat(document.getElementById('s-rb').value);if(isNaN(b)){toast('Enter the rent fund balance.');break}
       rf.start=r2(b);rf.startDate=document.getElementById('s-rd').value||TODAY;rf.first=document.getElementById('s-rf').value;rf.last=document.getElementById('s-rl').value;if(rf.last<rf.first){toast('Lease end must be after the first month.');break}}
-    else if(v==='spend'){const sp=spendCfg();const b=parseFloat(document.getElementById('s-pb').value.replace(/[\u2212\u2013]/g,'-').replace(/[$,\s]/g,''));if(isNaN(b)){toast('Enter the spending account balance.');break}sp.start=r2(b);sp.startDate=document.getElementById('s-pd').value||TODAY}
+    else if(v==='spend'){const sp=spendCfg();const b=parseFloat(document.getElementById('s-pb').value.replace(/[\u2212\u2013]/g,'-').replace(/[$,\s]/g,''));if(isNaN(b)){toast('Enter the spending account balance.');break}sp.start=r2(b);sp.startDate=document.getElementById('s-pd').value||TODAY;sp.incl=allItemsFlat().filter(i=>i.d===sp.startDate&&!i.up).map(i=>i.id)}
     else{const sv=S.settings.saving;const b=parseFloat(document.getElementById('s-sb').value);if(isNaN(b)){toast('Enter a starting balance.');break}sv.start=r2(b);sv.startDate=document.getElementById('s-sd').value||TODAY}
     saveSettings();toast('Saved');render();break}
   }
